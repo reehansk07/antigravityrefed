@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tenant Trust</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: hsl(210, 40%, 98%);
+      --bg-gradient: radial-gradient(at 0% 0%, hsla(215, 100%, 95%, 1) 0, transparent 50%), 
+                     radial-gradient(at 50% 0%, hsla(225, 100%, 98%, 1) 0, transparent 50%), 
+                     radial-gradient(at 100% 0%, hsla(210, 100%, 96%, 1) 0, transparent 50%);
+      --card: hsla(0, 0%, 100%, 0.8);
+      --card-blur: blur(12px);
+      --primary: hsl(222, 47%, 11%);
+      --secondary: hsl(217, 91%, 60%);
+      --accent: hsl(160, 84%, 39%);
+      --muted: hsl(215, 16%, 47%);
+      --border: hsla(214, 32%, 91%, 0.8);
+      --header-grad: linear-gradient(135deg, hsl(222, 47%, 11%) 0%, hsl(217, 91%, 60%) 100%);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: var(--bg);
+      background-image: var(--bg-gradient);
+      color: var(--primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      background: var(--header-grad);
+      color: #fff;
+      padding: 40px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, hsla(0, 0%, 100%, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    header h1 {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2.2rem, 3vw, 3.2rem);
+      letter-spacing: -0.04em;
+      font-weight: 700;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-logo-mark {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      background: #fff;
+      color: var(--secondary);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      transform: rotate(-5deg);
+    }
+
+    header .tagline {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 40px auto;
+      padding: 0 40px 80px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 32px;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      background: var(--card);
+      backdrop-filter: var(--card-blur);
+      -webkit-backdrop-filter: var(--card-blur);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 32px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--secondary);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--primary);
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      flex: 1;
+      min-width: 220px;
+      background: hsla(210, 40%, 98%, 0.6);
+      padding: 32px;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--secondary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .stat:hover {
+      background: #fff;
+      transform: scale(1.02);
+    }
+
+    .stat:hover::before {
+      opacity: 1;
+    }
+
+    .stat strong {
+      display: block;
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.8rem;
+      margin-bottom: 6px;
+      color: var(--secondary);
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .stat small {
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      margin-top: 20px;
+    }
+
+    th {
+      padding: 16px 20px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    td {
+      padding: 18px 20px;
+      background: hsla(210, 40%, 98%, 0.4);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td:first-child {
+      border-left: 1px solid var(--border);
+      border-top-left-radius: 16px;
+      border-bottom-left-radius: 16px;
+    }
+
+    td:last-child {
+      border-right: 1px solid var(--border);
+      border-top-right-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+
+    tbody tr {
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    tbody tr:hover td {
+      background: #fff;
+      border-color: var(--secondary);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .status .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .status.active { background: hsla(160, 84%, 39%, 0.1); color: hsl(160, 84%, 30%); }
+    .status.active .dot { background: hsl(160, 84%, 39%); }
+    .status.pending { background: hsla(35, 92%, 50%, 0.1); color: hsl(35, 92%, 40%); }
+    .status.pending .dot { background: hsl(35, 92%, 50%); }
+    .status.delayed { background: hsla(0, 72%, 51%, 0.1); color: hsl(0, 72%, 45%); }
+    .status.delayed .dot { background: hsl(0, 72%, 51%); }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .submit-btn, .action {
+      background: var(--header-grad);
+      color: #fff;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 18px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: 0 8px 20px -6px hsla(217, 91%, 60%, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .submit-btn:hover, .action:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px -6px hsla(217, 91%, 60%, 0.6);
+      filter: brightness(1.1);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form-field label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      padding: 14px 18px;
+      font-size: 1rem;
+      background: hsla(210, 40%, 98%, 0.6);
+      transition: all 0.3s ease;
+    }
+
+    .form-field textarea {
+      resize: vertical;
+      min-height: 140px;
+    }
+
+    .submit-btn {
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    .search-input {
+      background: hsla(210, 40%, 98%, 0.8);
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      padding: 16px 24px;
+      font-size: 1rem;
+      width: 100%;
+      max-width: 360px;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--secondary);
+      background: #fff;
+      box-shadow: var(--shadow-lg);
+      outline: none;
+    }
+
+    .detail-panel {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      margin-top: 32px;
+      box-shadow: var(--shadow-lg);
+      animation: slideIn 0.4s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .selected-row td {
+      background: hsla(217, 91%, 60%, 0.1) !important;
+      border-color: var(--secondary) !important;
+    }
+
+    .delete-btn {
+      border: none;
+      background: #e74c3c;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .delete-btn:hover {
+      opacity: 0.95;
+    }
+
+    .submit-btn:hover {
+      opacity: 0.95;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus,
+    .search-input:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      background: #fff;
+    }
+
+    @media (max-width: 1100px) {
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 24px;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    body.dark-mode {
+      --bg: hsl(222, 47%, 4%);
+      --bg-gradient: radial-gradient(at 0% 0%, hsla(222, 47%, 12%, 1) 0, transparent 50%), 
+                     radial-gradient(at 100% 100%, hsla(222, 47%, 8%, 1) 0, transparent 50%);
+      --card: hsla(222, 47%, 11%, 0.8);
+      --primary: hsl(210, 40%, 98%);
+      --muted: hsl(215, 16%, 70%);
+      --border: hsla(217, 32%, 18%, 0.8);
+      --header-grad: linear-gradient(135deg, hsl(222, 47%, 2%) 0%, hsl(222, 47%, 15%) 100%);
+    }
+
+    body.dark-mode td {
+      background: hsla(222, 47%, 15%, 0.4);
+    }
+
+    body.dark-mode .stat {
+      background: hsla(222, 47%, 8%, 0.6);
+    }
+
+    body.dark-mode .detail-panel {
+      background: hsla(222, 47%, 11%, 1);
+    }
+
+    body.dark-mode .form-field input,
+    body.dark-mode .form-field select,
+    body.dark-mode .form-field textarea,
+    body.dark-mode .search-input {
+      background: hsla(222, 47%, 8%, 1);
+      border-color: var(--border);
+    }
+
+    /* Calendar Styles */
+    .calendar-container {
+      margin-top: 24px;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+    .calendar-day-label {
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding-bottom: 10px;
+    }
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      border-radius: 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      position: relative;
+      border: 1px solid var(--border);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: default;
+    }
+    .calendar-day:hover {
+      border-color: var(--secondary);
+      background: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .calendar-day.today {
+      background: var(--secondary);
+      color: #fff;
+      border-color: var(--secondary);
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+    }
+    .calendar-day.has-due::after {
+      content: "";
+      position: absolute;
+      bottom: 8px;
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .calendar-day.today.has-due::after {
+      background: #fff;
+      box-shadow: 0 0 8px #fff;
+    }
+    .calendar-day.other-month {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .loading-ai {
+      position: relative;
+      color: transparent !important;
+      pointer-events: none;
+    }
+
+    .loading-ai::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin-top: -8px;
+      margin-left: -8px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Login Styles */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      background-image: var(--bg-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 24px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card);
+      backdrop-filter: var(--card-blur);
+      -webkit-backdrop-filter: var(--card-blur);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 48px;
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Overlay -->
+  <div id="login-overlay" class="login-overlay">
+    <div class="login-card">
+      <div class="brand-logo" style="margin-bottom: 32px; justify-content: center;">
+        <div class="brand-logo-mark">TT</div>
+        <h1 style="color: var(--primary); font-size: 2.2rem; letter-spacing: -0.04em;">Tenant Trust</h1>
+      </div>
+      <p style="color: var(--muted); text-align: center; margin-bottom: 40px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem;">Secure Access Portal</p>
+      
+      <form id="login-form">
+        <div class="form-field" style="margin-bottom: 24px;">
+          <label>Username</label>
+          <input type="text" id="login-username" placeholder="Enter username" required>
+        </div>
+        <div class="form-field" style="margin-bottom: 32px;">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="submit-btn" style="width: 100%; padding: 20px;">Unlock Dashboard</button>
+        <p id="login-error" style="color: hsl(0, 72%, 51%); font-size: 0.9rem; margin-top: 20px; text-align: center; display: none; font-weight: 700;">Invalid credentials. Please try again.</p>
+        <p style="margin-top: 24px; text-align: center; font-size: 0.9rem; color: var(--muted);">
+          Don't have an account? <a href="#" id="show-signup" style="color: var(--secondary); font-weight: 700; text-decoration: none;">Create New Account</a>
+        </p>
+      </form>
+
+      <form id="signup-form" style="display: none;">
+        <div class="form-field" style="margin-bottom: 20px;">
+          <label>New Username</label>
+          <input type="text" id="signup-username" placeholder="Choose a username" required>
+        </div>
+        <div class="form-field" style="margin-bottom: 20px;">
+          <label>New Password</label>
+          <input type="password" id="signup-password" placeholder="Choose a password" required>
+        </div>
+        <div class="form-field" style="margin-bottom: 32px;">
+          <label>Confirm Password</label>
+          <input type="password" id="signup-confirm" placeholder="Confirm password" required>
+        </div>
+        <button type="submit" class="submit-btn" style="width: 100%; padding: 20px; background: var(--accent);">Create Account</button>
+        <p id="signup-error" style="color: hsl(0, 72%, 51%); font-size: 0.9rem; margin-top: 20px; text-align: center; display: none; font-weight: 700;"></p>
+        <p style="margin-top: 24px; text-align: center; font-size: 0.9rem; color: var(--muted);">
+          Already have an account? <a href="#" id="show-login" style="color: var(--secondary); font-weight: 700; text-decoration: none;">Login Now</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div id="dashboard-content" style="display: none;">
+    <header>
+    <div class="brand-logo">
+      <div class="brand-logo-mark">TT</div>
+      <div>
+        <h1>Tenant Trust</h1>
+        <p class="tagline">Monitor houses, tenants, payments, and maintenance from one dashboard.</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button class="action" id="theme-toggle-btn">Toggle Dark Mode</button>
+      <button class="action" id="export-data-btn" style="background: var(--accent);">Export Data</button>
+      <button class="action" id="logout-btn" style="background: hsl(0, 72%, 51%);">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="section-title">
+        <h2>Portfolio Overview</h2>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <strong id="active-units-count">27</strong>
+          <small>Active houses</small>
+        </div>
+        <div class="stat">
+          <strong id="monthly-rent-total">₹48,250</strong>
+          <small>Monthly rent revenue</small>
+        </div>
+        <div class="stat">
+          <strong id="occupancy-rate">94%</strong>
+          <small>Occupancy rate</small>
+        </div>
+      </div>
+    <section class="card calendar-section" style="margin-top: 24px;">
+      <div class="calendar-header">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <h2>Rent Due Calendar</h2>
+          <button type="button" class="action" id="toggle-calendar-btn" style="background: var(--muted); padding: 0.4rem 0.8rem; font-size: 0.75rem;">Minimize</button>
+        </div>
+        <div id="calendar-month-year" style="font-weight: 700; color: var(--secondary); font-family: 'Outfit', sans-serif;"></div>
+      </div>
+      <div id="calendar-content">
+        <div class="calendar-grid" id="calendar-grid">
+          <!-- Day labels and days will be injected here -->
+        </div>
+        <p style="margin-top: 16px; font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 8px;">
+          <span style="display: inline-block; width: 8px; height: 8px; background: var(--accent); border-radius: 50%;"></span>
+          Dots indicate houses with rent due on that day.
+        </p>
+      </div>
+    </section>
+    </section>
+
+    <section class="grid grid-3">
+      <article class="card">
+        <h2>Upcoming Payments</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Tenant</th>
+              <th>House Number</th>
+              <th>Due</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody id="upcoming-payments-body">
+          </tbody>
+        </table>
+      </article>
+
+      <article class="card">
+        <h2>Tenant Status</h2>
+        <div class="search-row">
+          <input id="tenant-search" class="search-input" type="search" placeholder="Search tenants by name or flat..." />
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>House Number</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tenant-status-body">
+          </tbody>
+        </table>
+        <div class="detail-panel">
+          <h3>Tenant Details</h3>
+          <div class="detail-row">
+            <div>
+              <div class="detail-label">Name</div>
+              <div id="detail-name" class="detail-value">Select a tenant</div>
+            </div>
+            <div>
+              <div class="detail-label">House Number</div>
+              <div id="detail-unit" class="detail-value">—</div>
+            </div>
+            <div>
+              <div class="detail-label">Move-in</div>
+              <div id="detail-movein" class="detail-value">—</div>
+            </div>
+            <div>
+              <div class="detail-label">Rent</div>
+              <div id="detail-rent" class="detail-value">—</div>
+            </div>
+            <div>
+              <div class="detail-label">Status</div>
+              <div id="detail-status" class="detail-value">—</div>
+            </div>
+            <div style="grid-column: span 2;">
+              <div class="detail-label">Notes</div>
+              <div id="detail-notes" class="detail-value">—</div>
+            </div>
+          </div>
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button id="whatsapp-btn" class="submit-btn" style="background: #25D366; flex: 1;">Send WhatsApp Reminder</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Maintenance Requests</h2>
+        <div style="margin-bottom: 16px;">
+          <form id="maintenance-form" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="maintenance-flat" placeholder="House Number e.g. 7C" style="padding: 8px; border: 1px solid #d8dee6; border-radius: 8px;" />
+            <input type="text" id="maintenance-issue" placeholder="Issue e.g. Leaky faucet" style="padding: 8px; border: 1px solid #d8dee6; border-radius: 8px; flex: 1;" />
+            <select id="maintenance-status" style="padding: 8px; border: 1px solid #d8dee6; border-radius: 8px;">
+              <option value="pending">Pending</option>
+              <option value="active">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+            <button type="button" id="add-maintenance-btn" class="submit-btn" style="padding: 8px 12px;">Add</button>
+            <button type="button" id="clear-maintenance-btn" class="submit-btn" style="padding: 8px 12px; background: #c0392b;">Clear All</button>
+          </form>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Issue</th>
+              <th>House Number</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="maintenance-body">
+          </tbody>
+        </table>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="section-title">
+        <h2>Property & Tenant Management</h2>
+        <button type="button" class="action" id="toggle-mgmt-btn" style="background: var(--muted); padding: 0.5rem 1rem; font-size: 0.85rem;">Minimize</button>
+      </div>
+      <div id="mgmt-content" style="transition: all 0.3s ease;">
+      <div class="grid">
+        <div class="card" style="padding: 18px;">
+          <h2>Newest Listings</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>House Number</th>
+                <th>Rent</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="property-listings-body">
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="padding: 18px;">
+          <h2>Quick Add Tenant</h2>
+          <form id="tenant-form">
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="tenant-name">Tenant Name</label>
+                <input type="text" id="tenant-name" placeholder="e.g. David Kim" />
+              </div>
+              <div class="form-field">
+                <label for="unit-number">House Number</label>
+                <input type="text" id="unit-number" placeholder="e.g. 3B" />
+              </div>
+              <div class="form-field">
+                <label for="move-in-date">Move-in Date</label>
+                <input type="date" id="move-in-date" />
+              </div>
+              <div class="form-field">
+                <label for="rent-amount">Monthly Rent</label>
+                <input type="text" id="rent-amount" placeholder="₹0.00" />
+              </div>
+              <div class="form-field">
+                <label for="tenant-status">Tenant Status</label>
+                <select id="tenant-status">
+                  <option value="active">Active</option>
+                  <option value="pending">Lease Renewal</option>
+                  <option value="delayed">Delinquent</option>
+                </select>
+              </div>
+              <div class="form-field" style="grid-column: span 2;">
+                <label for="notes">Notes</label>
+                <textarea id="notes" placeholder="Lease details, pet policy, special terms..."></textarea>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <button type="button" id="save-tenant-btn" class="submit-btn">Save Tenant</button>
+              <button type="button" id="clear-tenant-btn" class="submit-btn" style="background:#c0392b;">Clear All</button>
+            </div>
+          </form>
+        </div>
+
+
+        <div class="card" id="property-form-card" style="padding: 18px;">
+          <h2>Add New Property</h2>
+          <form id="property-form">
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="property-name">Property Name</label>
+                <input type="text" id="property-name" placeholder="e.g. Maplewood Apartments" />
+              </div>
+              <div class="form-field">
+                <label for="flat-number">House Number</label>
+                <input type="text" id="flat-number" placeholder="e.g. 4B" />
+              </div>
+              <div class="form-field">
+                <label for="property-rent">Monthly Rent</label>
+                <input type="text" id="property-rent" placeholder="₹0.00" />
+              </div>
+              <div class="form-field">
+                <label for="property-status">Status</label>
+                <select id="property-status">
+                  <option value="available">Available</option>
+                  <option value="occupied">Occupied</option>
+                </select>
+              </div>
+              <div class="form-field" style="grid-column: span 2;">
+                <label for="property-notes">Notes</label>
+                <textarea id="property-notes" placeholder="Property details, amenities, location..."></textarea>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <button type="button" id="save-property-btn" class="submit-btn">Save Property</button>
+              <button type="button" id="cancel-property-btn" class="submit-btn" style="background:#c0392b;">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    </section>
+  </main>
+  <script>
+    const MAX_UNITS = 30;
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const tenantForm = document.getElementById('tenant-form');
+    const saveTenantBtn = document.getElementById('save-tenant-btn');
+    const clearTenantBtn = document.getElementById('clear-tenant-btn');
+    const tenantStatusBody = document.getElementById('tenant-status-body');
+    const tenantSearch = document.getElementById('tenant-search');
+    const activeUnitsCount = document.getElementById('active-units-count');
+    const monthlyRentTotal = document.getElementById('monthly-rent-total');
+    const occupancyRate = document.getElementById('occupancy-rate');
+    const maintenanceStatus = document.getElementById('maintenance-status');
+    const addMaintenanceBtn = document.getElementById('add-maintenance-btn');
+    const maintenanceBody = document.getElementById('maintenance-body');
+    const propertyListingsBody = document.getElementById('property-listings-body');
+    const upcomingPaymentsBody = document.getElementById('upcoming-payments-body');
+    const maintenanceForm = document.getElementById('maintenance-form');
+    const maintenanceFlat = document.getElementById('maintenance-flat');
+    const maintenanceIssue = document.getElementById('maintenance-issue');
+    const propertyForm = document.getElementById('property-form');
+    const propertyFormCard = document.getElementById('property-form-card');
+    const savePropertyBtn = document.getElementById('save-property-btn');
+    const cancelPropertyBtn = document.getElementById('cancel-property-btn');
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 0,
+      }).format(value);
+    }
+
+    function getStatusLabel(status) {
+      switch (status) {
+        case 'pending':
+          return 'Lease Renewal';
+        case 'delayed':
+          return 'Delinquent';
+        default:
+          return 'Active';
+      }
+    }
+
+    function getStatusClass(status) {
+      switch (status) {
+        case 'pending':
+          return 'pending';
+        case 'delayed':
+          return 'delayed';
+        default:
+          return 'active';
+      }
+    }
+
+    function parseRentAmount(value) {
+      const amount = Number(value.replace(/[^0-9.-]+/g, '') || 0);
+      return Number.isFinite(amount) ? amount : 0;
+    }
+
+    function createPropertyRow(property, index) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${property.name}</td>
+        <td>${property.flat}</td>
+        <td>${property.rent}</td>
+        <td><span class="status ${property.status === 'available' ? 'pending' : 'active'}"><span class="dot"></span>${property.status === 'available' ? 'Available' : 'Occupied'}</span></td>
+        <td><button type="button" class="delete-btn property-delete" data-index="${index}">Delete</button></td>
+      `;
+      return row;
+    }
+
+    function deleteProperty(index) {
+      const properties = getSavedProperties();
+      properties.splice(index, 1);
+      saveProperties(properties);
+      renderProperties();
+    }
+
+    function renderProperties() {
+      propertyListingsBody.innerHTML = '';
+      const properties = getSavedProperties();
+      properties.slice().reverse().forEach((property, index) => {
+        // Correct index after reverse: original index is properties.length - 1 - index
+        const originalIndex = (properties.length - 1) - index;
+        propertyListingsBody.appendChild(createPropertyRow(property, originalIndex));
+      });
+      updateDashboard();
+    }
+
+    function addProperty() {
+      const name = document.getElementById('property-name').value.trim();
+      const flat = document.getElementById('flat-number').value.trim();
+      const rent = document.getElementById('property-rent').value.trim();
+      const status = document.getElementById('property-status').value;
+      const notes = document.getElementById('property-notes').value.trim();
+
+      if (!name || !flat || !rent) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      const newProperty = { name, flat, rent, status, notes };
+      const properties = getSavedProperties();
+      properties.push(newProperty);
+      saveProperties(properties);
+      
+      // Ensure the management section is visible to see the new property
+      mgmtContent.style.display = 'block';
+      toggleMgmtBtn.textContent = 'Minimize';
+      toggleMgmtBtn.style.background = 'var(--muted)';
+
+      renderProperties();
+      propertyForm.reset();
+      propertyFormCard.style.display = 'none';
+      alert('Property added successfully!');
+    }
+
+    function calculateRiskScore(tenant) {
+      let score = 0;
+      if (tenant.status === 'delayed') score += 55;
+      else if (tenant.status === 'pending') score += 30;
+      else score += 10;
+
+      const rentValue = parseRentAmount(tenant.rentAmount);
+      if (rentValue >= 20000) score += 15;
+
+      const maintenance = getSavedMaintenance();
+      const openRequests = maintenance.filter(m => m.flat.toLowerCase() === tenant.unit.toLowerCase() && m.status !== 'completed');
+      score += openRequests.length * 15;
+
+      const text = `${tenant.notes || ''} ${tenant.name} ${tenant.unit}`.toLowerCase();
+      ['late', 'delinquent', 'issue', 'complaint', 'damage'].forEach((keyword) => {
+        if (text.includes(keyword)) score += 10;
+      });
+
+      return Math.min(100, Math.max(0, score));
+    }
+
+    function showTenantDetails(tenant, row) {
+      const detailName = document.getElementById('detail-name');
+      const detailUnit = document.getElementById('detail-unit');
+      const detailMovein = document.getElementById('detail-movein');
+      const detailRent = document.getElementById('detail-rent');
+      const detailStatus = document.getElementById('detail-status');
+      const detailNotes = document.getElementById('detail-notes');
+      const whatsappBtn = document.getElementById('whatsapp-btn');
+
+      clearSelectedRow();
+      if (row) {
+        row.classList.add('selected-row');
+      }
+
+      detailName.textContent = tenant.name;
+      detailUnit.textContent = tenant.unit;
+      detailMovein.textContent = tenant.moveInDate;
+      detailRent.textContent = tenant.rentAmount;
+      detailStatus.textContent = getStatusLabel(tenant.status);
+      detailNotes.textContent = tenant.notes || 'No notes available.';
+
+      whatsappBtn.onclick = () => {
+        const msg = `Hello ${tenant.name}, this is a reminder regarding your rent of ${tenant.rentAmount} for House ${tenant.unit}. Please let us know if you have any questions. Thank you!`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+      };
+    }
+
+    function downloadDataAsCSV() {
+      const tenants = getSavedTenants();
+      if (!tenants.length) return alert('No data to export.');
+      
+      let csv = 'Name,House Number,Move-In,Rent,Status,Notes\n';
+      tenants.forEach(t => {
+        csv += `"${t.name}","${t.unit}","${t.moveInDate}","${t.rentAmount}","${t.status}","${t.notes || ''}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('hidden', '');
+      a.setAttribute('href', url);
+      a.setAttribute('download', 'tenant_report.csv');
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function createTenantRow(tenant, index) {
+      const row = document.createElement('tr');
+      row.dataset.index = index;
+      row.dataset.name = tenant.name.toLowerCase();
+      row.dataset.unit = tenant.unit.toLowerCase();
+      row.innerHTML = `
+        <td>${tenant.name}</td>
+        <td>${tenant.unit}</td>
+        <td><span class="status ${getStatusClass(tenant.status)}"><span class="dot"></span>${getStatusLabel(tenant.status)}</span></td>
+        <td><button type="button" class="delete-btn tenant-delete" data-index="${index}">Delete</button></td>
+      `;
+      row.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('delete-btn')) {
+          showTenantDetails(tenant, row);
+        }
+      });
+      return row;
+    }
+
+
+    function clearSelectedRow() {
+      Array.from(tenantStatusBody.children).forEach((row) => row.classList.remove('selected-row'));
+    }
+
+    function clearTenantDetails() {
+      document.getElementById('detail-name').textContent = 'Select a tenant';
+      document.getElementById('detail-unit').textContent = '—';
+      document.getElementById('detail-movein').textContent = '—';
+      document.getElementById('detail-rent').textContent = '—';
+      document.getElementById('detail-status').textContent = '—';
+      document.getElementById('detail-notes').textContent = '—';
+    }
+
+    const defaultProperties = [
+      { name: 'Maplewood Apartments', flat: '1A', rent: '₹13,500', status: 'active', notes: 'Quiet corner unit.' },
+      { name: 'Maplewood Apartments', flat: '1B', rent: '₹14,000', status: 'active', notes: 'Recently renovated.' },
+      { name: 'Maplewood Apartments', flat: '1C', rent: '₹15,200', status: 'active', notes: 'Spacious layout.' },
+      { name: 'Maplewood Apartments', flat: '1D', rent: '₹15,500', status: 'active', notes: 'Near the elevator.' },
+      { name: 'Maplewood Apartments', flat: '2A', rent: '₹13,800', status: 'active', notes: 'Pool view.' },
+      { name: 'Maplewood Apartments', flat: '2B', rent: '₹14,500', status: 'active', notes: 'Standard 2BHK.' },
+      { name: 'Maplewood Apartments', flat: '2C', rent: '₹17,000', status: 'active', notes: 'Premium floor.' },
+      { name: 'Maplewood Apartments', flat: '2D', rent: '₹16,500', status: 'active', notes: 'West facing.' },
+      { name: 'Green Valley', flat: '3A', rent: '₹14,200', status: 'active', notes: 'Gated community.' },
+      { name: 'Green Valley', flat: '3B', rent: '₹15,000', status: 'active', notes: 'Top floor.' },
+      { name: 'Green Valley', flat: '3C', rent: '₹16,800', status: 'active', notes: 'Balcony access.' },
+      { name: 'Green Valley', flat: '3D', rent: '₹18,500', status: 'active', notes: 'Large master bedroom.' },
+      { name: 'Skyline Towers', flat: '4A', rent: '₹12,800', status: 'active', notes: 'Compact 1BHK.' },
+      { name: 'Skyline Towers', flat: '4B', rent: '₹14,800', status: 'active', notes: 'Modern kitchen.' },
+      { name: 'Skyline Towers', flat: '4C', rent: '₹15,500', status: 'active', notes: 'Quiet neighborhood.' },
+      { name: 'Skyline Towers', flat: '4D', rent: '₹17,200', status: 'active', notes: 'Corner unit.' },
+      { name: 'Skyline Towers', flat: '5A', rent: '₹13,000', status: 'active', notes: 'East facing.' },
+      { name: 'Skyline Towers', flat: '5B', rent: '₹16,000', status: 'active', notes: 'High ceiling.' },
+      { name: 'Skyline Towers', flat: '5C', rent: '₹16,200', status: 'active', notes: 'Partial city view.' },
+      { name: 'Skyline Towers', flat: '5D', rent: '₹18,000', status: 'active', notes: 'Double balcony.' },
+      { name: 'The Residency', flat: '6A', rent: '₹14,500', status: 'active', notes: 'Near main gate.' },
+      { name: 'The Residency', flat: '6B', rent: '₹15,800', status: 'active', notes: 'Well ventilated.' },
+      { name: 'The Residency', flat: '6C', rent: '₹16,500', status: 'active', notes: 'Park facing.' },
+      { name: 'The Residency', flat: '6D', rent: '₹19,000', status: 'active', notes: 'Luxurious finish.' },
+      { name: 'Orchid Heights', flat: '7A', rent: '₹13,500', status: 'active', notes: 'Standard unit.' },
+      { name: 'Orchid Heights', flat: '7B', rent: '₹14,200', status: 'active', notes: 'Close to parking.' },
+      { name: 'Orchid Heights', flat: '7C', rent: '₹15,000', status: 'active', notes: 'Middle floor.' },
+      { name: 'Orchid Heights', flat: '7D', rent: '₹17,500', status: 'active', notes: 'Large living area.' },
+      { name: 'The Zenith', flat: '8A', rent: '₹14,800', status: 'active', notes: 'City view.' },
+      { name: 'The Zenith', flat: '8B', rent: '₹20,000', status: 'active', notes: 'Penthouse.' }
+    ];
+
+    const defaultMaintenance = [
+      { flat: '3A', issue: 'Leaking faucet in kitchen', status: 'urgent', date: '2024-05-01' },
+      { flat: '2B', issue: 'AC cooling issue', status: 'pending', date: '2024-05-02' },
+      { flat: '5C', issue: 'Main door lock replacement', status: 'completed', date: '2024-04-28' },
+      { flat: '1D', issue: 'Wall paint touch-up', status: 'pending', date: '2024-05-05' },
+      { flat: '4C', issue: 'Geyser not working', status: 'urgent', date: '2024-05-06' },
+      { flat: '6D', issue: 'Internet wiring check', status: 'pending', date: '2024-05-06' },
+      { flat: '3B', issue: 'Broken window latch', status: 'completed', date: '2024-04-30' },
+      { flat: '8A', issue: 'Balcony light replacement', status: 'pending', date: '2024-05-04' }
+    ];
+
+    function getSavedProperties() {
+      const saved = localStorage.getItem('savedProperties');
+      if (saved !== null) {
+        return JSON.parse(saved);
+      }
+      saveProperties(defaultProperties);
+      return defaultProperties;
+    }
+
+    function saveProperties(properties) {
+      localStorage.setItem('savedProperties', JSON.stringify(properties));
+    }
+
+    function getSavedMaintenance() {
+      const saved = localStorage.getItem('savedMaintenance');
+      if (saved !== null) {
+        return JSON.parse(saved);
+      }
+      saveMaintenance(defaultMaintenance);
+      return defaultMaintenance;
+    }
+
+    function saveMaintenance(maintenance) {
+      localStorage.setItem('savedMaintenance', JSON.stringify(maintenance));
+    }
+
+    function createMaintenanceRow(request, index) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${request.issue}</td>
+        <td>${request.flat}</td>
+        <td><span class="status ${request.status}"><span class="dot"></span>${request.status === 'urgent' ? 'Urgent' : request.status === 'pending' ? 'Pending' : 'Completed'}</span></td>
+        <td><button type="button" class="delete-btn maintenance-delete" data-index="${index}">Delete</button></td>
+      `;
+      return row;
+    }
+
+    function deleteMaintenance(index) {
+      const maintenance = getSavedMaintenance();
+      maintenance.splice(index, 1);
+      saveMaintenance(maintenance);
+      renderMaintenance();
+    }
+
+    function renderMaintenance() {
+      maintenanceBody.innerHTML = '';
+      const maintenance = getSavedMaintenance();
+      maintenance.forEach((request, index) => {
+        maintenanceBody.appendChild(createMaintenanceRow(request, index));
+      });
+    }
+
+    function addMaintenance() {
+      const flat = maintenanceFlat.value.trim();
+      const issue = maintenanceIssue.value.trim();
+      const status = maintenanceStatus.value;
+      if (!flat || !issue) {
+        alert('Please fill in flat and issue.');
+        return;
+      }
+      const newRequest = { flat, issue, status };
+      const maintenance = getSavedMaintenance();
+      maintenance.push(newRequest);
+      saveMaintenance(maintenance);
+      renderMaintenance();
+      maintenanceForm.reset();
+    }
+
+    const defaultTenants = [
+      { name: 'Amy Harrison', unit: '2B', moveInDate: '2023-01-15', rentAmount: '₹14,500', status: 'active', notes: 'Stable, always pays on time.' },
+      { name: 'Raj Patel', unit: '3D', moveInDate: '2021-06-20', rentAmount: '₹18,500', status: 'delayed', notes: 'Late payment this month. Needs follow-up.' },
+      { name: 'Olivia Chen', unit: '1C', moveInDate: '2024-03-10', rentAmount: '₹15,200', status: 'active', notes: 'Has a small pet dog.' },
+      { name: 'Jamal Cooper', unit: '4A', moveInDate: '2022-11-01', rentAmount: '₹12,800', status: 'pending', notes: 'Lease renewal coming up.' },
+      { name: 'James Bond', unit: '2C', moveInDate: '2021-12-01', rentAmount: '₹17,000', status: 'delayed', notes: 'Often travels. Late payment due to business trip.' },
+      { name: 'Emily Dickinson', unit: '7A', moveInDate: '2024-01-30', rentAmount: '₹13,500', status: 'active', notes: 'Quiet and keeps to herself.' },
+      { name: 'David Bowie', unit: '8B', moveInDate: '2020-12-15', rentAmount: '₹20,000', status: 'pending', notes: 'Penthouse suite. Lease expiring soon.' },
+      { name: 'Henry Ford', unit: '6D', moveInDate: '2020-05-12', rentAmount: '₹19,000', status: 'active', notes: 'Premium unit, excellent tenant.' },
+      { name: 'Mia Wallace', unit: '3B', moveInDate: '2024-02-14', rentAmount: '₹15,000', status: 'active', notes: 'No concerns.' },
+      { name: 'Sebastian Bach', unit: '7B', moveInDate: '2023-04-18', rentAmount: '₹14,200', status: 'delayed', notes: 'Late payment. Noise complaints from neighbors.' }
+    ];
+
+    function getSavedTenants() {
+      const saved = localStorage.getItem('savedTenants');
+      if (saved !== null) {
+        return JSON.parse(saved);
+      }
+      saveTenants(defaultTenants);
+      return defaultTenants;
+    }
+
+    function saveTenants(tenants) {
+      localStorage.setItem('savedTenants', JSON.stringify(tenants));
+    }
+
+    function updateDashboard() {
+      const tenants = getSavedTenants();
+      const properties = getSavedProperties();
+      const totalRent = tenants.reduce((sum, tenant) => sum + Number(tenant.rentAmount.replace(/[^0-9.-]+/g, '') || 0), 0);
+      activeUnitsCount.textContent = properties.length;
+      monthlyRentTotal.textContent = formatCurrency(totalRent);
+      occupancyRate.textContent = `${Math.min(100, Math.round((tenants.length / Math.max(1, properties.length)) * 100))}%`;
+    }
+
+    function filterTenants() {
+      const query = tenantSearch.value.trim().toLowerCase();
+      Array.from(tenantStatusBody.children).forEach((row) => {
+        if (query === '') {
+          row.style.display = '';
+        } else {
+          const matches = row.dataset.name.includes(query) || row.dataset.unit.includes(query);
+          row.style.display = matches ? '' : 'none';
+        }
+      });
+    }
+
+    function renderCalendar() {
+      const calendarGrid = document.getElementById('calendar-grid');
+      const monthYearDisplay = document.getElementById('calendar-month-year');
+      calendarGrid.innerHTML = '';
+      
+      const now = new Date();
+      const month = now.getMonth();
+      const year = now.getFullYear();
+      
+      monthYearDisplay.textContent = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDayOfMonth = new Date(year, month, 1).getDay();
+      
+      const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      dayLabels.forEach(label => {
+        const div = document.createElement('div');
+        div.className = 'calendar-day-label';
+        div.textContent = label;
+        calendarGrid.appendChild(div);
+      });
+      
+      // Pad empty days
+      for (let i = 0; i < firstDayOfMonth; i++) {
+        const div = document.createElement('div');
+        div.className = 'calendar-day other-month';
+        calendarGrid.appendChild(div);
+      }
+      
+      const tenants = getSavedTenants();
+      const today = now.getDate();
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const div = document.createElement('div');
+        div.className = 'calendar-day';
+        if (day === today) div.classList.add('today');
+        div.textContent = day;
+        
+        // Check if any tenant has rent due (simulated: rent due on same day as move-in day)
+        const hasDue = tenants.some(tenant => {
+          const moveInDay = new Date(tenant.moveInDate).getDate();
+          return moveInDay === day;
+        });
+        
+        if (hasDue) {
+          div.classList.add('has-due');
+          const dueTenants = tenants.filter(t => new Date(t.moveInDate).getDate() === day);
+          div.title = `Rent due: ${dueTenants.map(t => t.name).join(', ')}`;
+        }
+        
+        calendarGrid.appendChild(div);
+      }
+    }
+
+    function renderUpcomingPayments() {
+      upcomingPaymentsBody.innerHTML = '';
+      const tenants = getSavedTenants();
+      const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+      
+      tenants.slice(0, 5).forEach(tenant => {
+        const row = document.createElement('tr');
+        const day = new Date(tenant.moveInDate).getDate();
+        row.innerHTML = `
+          <td>${tenant.name}</td>
+          <td>${tenant.unit}</td>
+          <td>${currentMonth} ${day}</td>
+          <td>${tenant.rentAmount}</td>
+        `;
+        upcomingPaymentsBody.appendChild(row);
+      });
+    }
+
+    function renderSavedTenants() {
+      tenantStatusBody.innerHTML = '';
+      const tenants = getSavedTenants();
+      tenants.forEach((tenant, index) => {
+        tenantStatusBody.appendChild(createTenantRow(tenant, index));
+      });
+      updateDashboard();
+      filterTenants();
+      renderUpcomingPayments();
+      if (tenants.length > 0) {
+        showTenantDetails(tenants[0], tenantStatusBody.children[0]);
+      } else {
+        clearTenantDetails();
+      }
+    }
+
+    function clearForm() {
+      tenantForm.reset();
+    }
+
+    function deleteTenant(index) {
+      const tenants = getSavedTenants();
+      tenants.splice(index, 1);
+      saveTenants(tenants);
+      renderSavedTenants();
+    }
+
+    saveTenantBtn.addEventListener('click', () => {
+      const name = document.getElementById('tenant-name').value.trim();
+      const unit = document.getElementById('unit-number').value.trim();
+      const moveInDate = document.getElementById('move-in-date').value;
+      const rentAmount = document.getElementById('rent-amount').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+      const status = document.getElementById('tenant-status').value;
+
+      if (!name || !unit || !moveInDate || !rentAmount) {
+        alert('Please fill in all required fields before saving.');
+        return;
+      }
+
+      const newTenant = {
+        name,
+        unit,
+        moveInDate,
+        rentAmount,
+        notes,
+        status,
+      };
+
+      const tenants = getSavedTenants();
+      tenants.push(newTenant);
+      saveTenants(tenants);
+      renderSavedTenants();
+      clearForm();
+      alert('Tenant saved successfully.');
+    });
+
+    clearTenantBtn.addEventListener('click', () => {
+      if (confirm('Remove all saved tenants from this browser?')) {
+        localStorage.setItem('savedTenants', JSON.stringify([]));
+        renderSavedTenants();
+      }
+    });
+
+    tenantStatusBody.addEventListener('click', (event) => {
+      const target = event.target;
+      const row = target.closest('tr');
+      if (!row) {
+        return;
+      }
+
+      if (target.matches('.delete-btn')) {
+        deleteTenant(Number(target.dataset.index));
+        return;
+      }
+
+      const tenants = getSavedTenants();
+      const index = Number(row.dataset.index);
+      if (!Number.isNaN(index) && tenants[index]) {
+        showTenantDetails(tenants[index], row);
+      }
+    });
+
+    const toggleMgmtBtn = document.getElementById('toggle-mgmt-btn');
+    const mgmtContent = document.getElementById('mgmt-content');
+    const toggleCalendarBtn = document.getElementById('toggle-calendar-btn');
+    const calendarContent = document.getElementById('calendar-content');
+
+    toggleMgmtBtn.addEventListener('click', () => {
+      if (mgmtContent.style.display === 'none') {
+        mgmtContent.style.display = 'block';
+        toggleMgmtBtn.textContent = 'Minimize';
+        toggleMgmtBtn.style.background = 'var(--muted)';
+      } else {
+        mgmtContent.style.display = 'none';
+        toggleMgmtBtn.textContent = 'Maximize';
+        toggleMgmtBtn.style.background = 'var(--secondary)';
+      }
+    });
+
+    toggleCalendarBtn.addEventListener('click', () => {
+      if (calendarContent.style.display === 'none') {
+        calendarContent.style.display = 'block';
+        toggleCalendarBtn.textContent = 'Minimize';
+        toggleCalendarBtn.style.background = 'var(--muted)';
+      } else {
+        calendarContent.style.display = 'none';
+        toggleCalendarBtn.textContent = 'Maximize';
+        toggleCalendarBtn.style.background = 'var(--secondary)';
+      }
+    });
+
+    tenantSearch.addEventListener('input', filterTenants);
+    addMaintenanceBtn.addEventListener('click', addMaintenance);
+    document.getElementById('clear-maintenance-btn').addEventListener('click', () => {
+      if (confirm('Clear all maintenance requests?')) {
+        saveMaintenance([]);
+        renderMaintenance();
+      }
+    });
+
+    maintenanceBody.addEventListener('click', (event) => {
+      if (event.target.matches('.maintenance-delete')) {
+        const index = Number(event.target.dataset.index);
+        deleteMaintenance(index);
+      }
+    });
+
+    themeToggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    savePropertyBtn.addEventListener('click', addProperty);
+    cancelPropertyBtn.addEventListener('click', () => {
+      propertyForm.reset();
+    });
+
+    propertyListingsBody.addEventListener('click', (event) => {
+      if (event.target.matches('.property-delete')) {
+        const index = Number(event.target.dataset.index);
+        if (confirm('Delete this property?')) {
+          deleteProperty(index);
+        }
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('isLoggedIn');
+      window.location.reload();
+    });
+
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const loginError = document.getElementById('login-error');
+    const signupError = document.getElementById('signup-error');
+    const loginOverlay = document.getElementById('login-overlay');
+    const dashboardContent = document.getElementById('dashboard-content');
+    const showSignupLink = document.getElementById('show-signup');
+    const showLoginLink = document.getElementById('show-login');
+
+    showSignupLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.style.display = 'none';
+      signupForm.style.display = 'block';
+    });
+
+    showLoginLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      signupForm.style.display = 'none';
+      loginForm.style.display = 'block';
+    });
+
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const user = document.getElementById('signup-username').value.trim();
+      const pass = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-confirm').value;
+
+      if (pass !== confirm) {
+        signupError.textContent = 'Passwords do not match.';
+        signupError.style.display = 'block';
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      if (users.some(u => u.username === user)) {
+        signupError.textContent = 'Username already exists.';
+        signupError.style.display = 'block';
+        return;
+      }
+
+      users.push({ username: user, password: pass });
+      localStorage.setItem('registeredUsers', JSON.stringify(users));
+      
+      alert('Account created successfully! Please login.');
+      signupForm.style.display = 'none';
+      loginForm.style.display = 'block';
+      signupForm.reset();
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const user = document.getElementById('login-username').value.trim();
+      const pass = document.getElementById('login-password').value;
+
+      // Check against registered users
+      const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      const foundUser = users.find(u => u.username === user && u.password === pass);
+
+      // Also allow the default admin for convenience
+      if (foundUser || (user === 'admin' && pass === 'admin123')) {
+        localStorage.setItem('isLoggedIn', 'true');
+        loginOverlay.style.display = 'none';
+        dashboardContent.style.display = 'block';
+      } else {
+        loginError.style.display = 'block';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        loginOverlay.style.display = 'none';
+        dashboardContent.style.display = 'block';
+      } else {
+        loginOverlay.style.display = 'flex';
+        dashboardContent.style.display = 'none';
+      }
+
+      document.getElementById('export-data-btn').addEventListener('click', downloadDataAsCSV);
+
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+      }
+      renderSavedTenants();
+      renderProperties();
+      renderCalendar();
+      clearTenantDetails();
+      renderMaintenance();
+    });
+  </script>
+</div>
+</body>
+</html>
